@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Action Tracker - Web3 DApp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.10.0/web3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .wallet-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .wallet-button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(240,147,251,0.4);
+            margin: 10px;
+        }
+
+        .wallet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240,147,251,0.6);
+        }
+
+        .wallet-connected {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .token-section {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .nft-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #fff;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            color: white;
+            min-width: 120px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .blockchain-stats {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .crypto-rewards {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.6);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .initiative-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .initiative-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .initiative-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .initiative-card p {
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            transition: width 1s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .impact-visualization {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .chart-bar {
+            background: linear-gradient(to top, #667eea, #764ba2);
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            margin: 0 5px;
+            position: relative;
+            transition: height 1s ease;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Climate Action Tracker</h1>
+            <p>Track your impact, join the movement, save our planet</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('wallet')">🔗 Web3 Wallet</button>
+            <button class="nav-tab" onclick="showSection('calculator')">📊 Carbon Calculator</button>
+            <button class="nav-tab" onclick="showSection('nft')">🎨 Green NFTs</button>
+            <button class="nav-tab" onclick="showSection('dao')">🏛️ Climate DAO</button>
+            <button class="nav-tab" onclick="showSection('initiatives')">🌱 Initiatives</button>
+            <button class="nav-tab" onclick="showSection('rewards')">💰 Crypto Rewards</button>
+        </div>
+
+        <!-- Web3 Wallet Section -->
+        <div id="wallet" class="content-section active">
+            <div class="wallet-section">
+                <h2 style="color: white; margin-bottom: 20px;">🔗 Connect Your Web3 Wallet</h2>
+                <div id="walletStatus">
+                    <button id="connectButton" class="wallet-button" onclick="connectWallet()">
+                        Connect MetaMask Wallet
+                    </button>
+                </div>
+                <div id="walletInfo" style="display: none; margin-top: 20px; color: white;">
+                    <p><strong>Connected Address:</strong> <span id="walletAddress"></span></p>
+                    <p><strong>Network:</strong> <span id="networkName"></span></p>
+                    <p><strong>Balance:</strong> <span id="walletBalance"></span> ETH</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🌐 Web3 Climate Impact Dashboard</h2>
+                
+                <div class="blockchain-stats">
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">📊 Your Blockchain Climate Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="userTokens">0</div>
+                            <div class="stat-label">GREEN Tokens Earned</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="userNFTs">0</div>
+                            <div class="stat-label">Climate NFTs Owned</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="carbonOffset">0</div>
+                            <div class="stat-label">CO₂ Offset (kg)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="daoVotes">0</div>
+                            <div class="stat-label">DAO Votes Cast</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="token-section">
+                    <h3>🪙 GREEN Token Economy</h3>
+                    <p>Earn GREEN tokens for climate-positive actions. Use them to vote in our DAO, purchase carbon offsets, or trade on DEXs.</p>
+                    <div style="margin: 20px 0;">
+                        <strong>Token Address:</strong> 0x742d35Cc6634C0532925a3b8D431d4097e1cdE9a (Polygon)
+                    </div>
+                    <button class="btn" onclick="addTokenToWallet()">Add GREEN Token to Wallet</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NFT Section -->
+        <div id="nft" class="content-section">
+            <div class="card">
+                <h2>🎨 Climate Action NFTs</h2>
+                <p>Earn unique NFT badges for your environmental achievements. Each NFT represents verified climate action and can be traded or displayed.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <div class="nft-badge">
+                        <h4>🌱 First Steps</h4>
+                        <p>Complete your first carbon calculation</p>
+                        <div style="margin-top: 10px;">
+                            <button class="btn" onclick="mintNFT('first-steps')">Mint NFT</button>
+                        </div>
+                    </div>
+                    
+                    <div class="nft-badge">
+                        <h4>🏆 Carbon Neutral</h4>
+                        <p>Achieve carbon neutrality for 1 month</p>
+                        <div style="margin-top: 10px;">
+                            <button class="btn" onclick="mintNFT('carbon-neutral')">Mint NFT</button>
+                        </div>
+                    </div>
+                    
+                    <div class="nft-badge">
+                        <h4>🌍 Community Leader</h4>
+                        <p>Lead 10+ community members to action</p>
+                        <div style="margin-top: 10px;">
+                            <button class="btn" onclick="mintNFT('community-leader')">Mint NFT</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🖼️ Your NFT Collection</h3>
+                    <div id="userNFTCollection">
+                        <p>Connect your wallet to view your Climate Action NFTs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAO Section -->
+        <div id="dao" class="content-section">
+            <div class="card">
+                <h2>🏛️ Climate Action DAO</h2>
+                <p>Participate in decentralized governance of climate initiatives. Vote on funding proposals, project priorities, and policy changes.</p>
+                
+                <div class="crypto-rewards">
+                    <h3>🗳️ Active Proposals</h3>
+                    <div class="initiative-card" style="margin: 15px 0;">
+                        <h4>Proposal #1: Fund Solar Panel Initiative</h4>
+                        <p>Allocate 10,000 GREEN tokens to support community solar installations</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                        <p><strong>Votes:</strong> 2,340 YES / 890 NO</p>
+                        <div style="margin-top: 15px;">
+                            <button class="btn" onclick="voteDAO('yes', 1)" style="margin-right: 10px;">Vote YES</button>
+                            <button class="btn" onclick="voteDAO('no', 1)">Vote NO</button>
+                        </div>
+                    </div>
+                    
+                    <div class="initiative-card" style="margin: 15px 0;">
+                        <h4>Proposal #2: Expand to New Regions</h4>
+                        <p>Launch Climate Action Tracker in Southeast Asia with local partnerships</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%;"></div>
+                        </div>
+                        <p><strong>Votes:</strong> 3,120 YES / 450 NO</p>
+                        <div style="margin-top: 15px;">
+                            <button class="btn" onclick="voteDAO('yes', 2)" style="margin-right: 10px;">Vote YES</button>
+                            <button class="btn" onclick="voteDAO('no', 2)">Vote NO</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Active Proposals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8,547</div>
+                        <div class="stat-label">DAO Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">45.2K</div>
+                        <div class="stat-label">Total Votes Cast</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$127K</div>
+                        <div class="stat-label">Treasury Value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crypto Rewards Section -->
+        <div id="rewards" class="content-section">
+            <div class="card">
+                <h2>💰 Crypto Rewards System</h2>
+                
+                <div class="crypto-rewards">
+                    <h3>🎯 Earn GREEN Tokens</h3>
+                    <div class="grid">
+                        <div class="initiative-card">
+                            <h4>Daily Check-in</h4>
+                            <p>Log your daily climate actions</p>
+                            <div class="badge">+10 GREEN</div>
+                            <button class="btn" onclick="claimReward('daily', 10)" style="margin-top: 10px;">Claim Reward</button>
+                        </div>
+                        
+                        <div class="initiative-card">
+                            <h4>Carbon Calculation</h4>
+                            <p>Complete monthly footprint assessment</p>
+                            <div class="badge">+25 GREEN</div>
+                            <button class="btn" onclick="claimReward('calculation', 25)" style="margin-top: 10px;">Claim Reward</button>
+                        </div>
+                        
+                        <div class="initiative-card">
+                            <h4>Community Challenge</h4>
+                            <p>Participate in global initiatives</p>
+                            <div class="badge">+50 GREEN</div>
+                            <button class="btn" onclick="claimReward('challenge', 50)" style="margin-top: 10px;">Claim Reward</button>
+                        </div>
+                        
+                        <div class="initiative-card">
+                            <h4>Referral Bonus</h4>
+                            <p>Invite friends to join the platform</p>
+                            <div class="badge">+100 GREEN</div>
+                            <button class="btn" onclick="claimReward('referral', 100)" style="margin-top: 10px;">Claim Reward</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="token-section">
+                    <h3>🔄 Token Utility</h3>
+                    <div class="grid">
+                        <div class="stat-card">
+                            <h4>🗳️ DAO Voting</h4>
+                            <p>Use tokens to vote on climate proposals</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>🌳 Carbon Offsets</h4>
+                            <p>Purchase verified carbon credits</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>🎨 NFT Minting</h4>
+                            <p>Mint achievement NFTs</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>💱 DEX Trading</h4>
+                            <p>Trade on decentralized exchanges</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carbon Calculator Section -->
+        <div id="calculator" class="content-section">
+            <div class="card">
+                <h2>🧮 Calculate Your Carbon Footprint</h2>
+                <form id="carbonForm">
+                    <div class="form-group">
+                        <label for="transport">Monthly Transportation (km driven/flown)</label>
+                        <input type="number" id="transport" placeholder="e.g., 1000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="energy">Monthly Home Energy Usage (kWh)</label>
+                        <input type="number" id="energy" placeholder="e.g., 500" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="diet">Diet Type</label>
+                        <select id="diet" required>
+                            <option value="">Select your diet</option>
+                            <option value="meat">High Meat</option>
+                            <option value="moderate">Moderate Meat</option>
+                            <option value="low">Low Meat</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waste">Weekly Waste (bags)</label>
+                        <input type="number" id="waste" placeholder="e.g., 3" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Calculate My Impact</button>
+                </form>
+                
+                <div id="results" style="display: none;">
+                    <div class="result-card card">
+                        <div class="result-number" id="totalEmissions">0</div>
+                        <p>kg CO₂ per month</p>
+                        <div id="comparison"></div>
+                    </div>
+                    
+                    <div class="impact-visualization">
+                        <h3>Your Impact Breakdown</h3>
+                        <div class="chart-container" id="chartContainer">
+                            <div class="chart-bar" id="transportBar">
+                                <div class="chart-label">Transport</div>
+                            </div>
+                            <div class="chart-bar" id="energyBar">
+                                <div class="chart-label">Energy</div>
+                            </div>
+                            <div class="chart-bar" id="dietBar">
+                                <div class="chart-label">Diet</div>
+                            </div>
+                            <div class="chart-bar" id="wasteBar">
+                                <div class="chart-label">Waste</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Local Initiatives Section -->
+        <div id="initiatives" class="content-section">
+            <div class="card">
+                <h2>🌱 Local Environmental Initiatives</h2>
+                <div class="form-group">
+                    <label for="location">Your Location</label>
+                    <input type="text" id="location" placeholder="Enter your city or region">
+                    <button class="btn" onclick="findInitiatives()" style="margin-top: 10px;">Find Initiatives</button>
+                </div>
+                
+                <div class="grid" id="initiativesGrid">
+                    <div class="initiative-card">
+                        <h3>🌳 Urban Forest Project</h3>
+                        <p>Community tree planting initiative to increase urban canopy coverage and reduce city temperatures.</p>
+                        <span class="badge">Ongoing</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <p><strong>Progress:</strong> 750/1000 trees planted</p>
+                    </div>
+                    
+                    <div class="initiative-card">
+                        <h3>♻️ Zero Waste Challenge</h3>
+                        <p>Monthly community challenge to reduce household waste and promote circular economy practices.</p>
+                        <span class="badge">This Month</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%;"></div>
+                        </div>
+                        <p><strong>Participants:</strong> 342 households</p>
+                    </div>
+                    
+                    <div class="initiative-card">
+                        <h3>🚲 Bike-to-Work Program</h3>
+                        <p>Encouraging sustainable transportation through bike-sharing and safe cycling infrastructure.</p>
+                        <span class="badge">Year-round</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <p><strong>CO₂ Saved:</strong> 12.5 tons this year</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Section -->
+        <div id="community" class="content-section">
+            <div class="card">
+                <h2>🤝 Community Impact</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">2,847</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">145.2</div>
+                        <div class="stat-label">Tons CO₂ Saved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Active Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Cities Participating</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>🏆 Current Challenges</h3>
+                    <div class="initiative-card">
+                        <h3>Global Plastic-Free Week</h3>
+                        <p>Join thousands worldwide in reducing single-use plastics for one week.</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 68%;"></div>
+                        </div>
+                        <p><strong>Participants:</strong> 1,942 / 2,500 goal</p>
+                        <button class="btn" style="margin-top: 10px;">Join Challenge</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Section -->
+        <div id="resources" class="content-section">
+            <div class="card">
+                <h2>📚 Sustainability Resources</h2>
+                
+                <h3 style="margin-bottom: 15px;">💡 Daily Tips</h3>
+                <div class="tip-card">
+                    <h4>🏠 Home Energy</h4>
+                    <p>Switch to LED bulbs - they use 75% less energy and last 25 times longer than traditional incandescent bulbs.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h4>🚗 Transportation</h4>
+                    <p>Combine errands into one trip. Planning your route can reduce your weekly driving by up to 20%.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h4>🍽️ Food Choices</h4>
+                    <p>Try "Meatless Monday" - reducing meat consumption just one day per week can save 1,900 lbs of CO₂ per year.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h4>💧 Water Conservation</h4>
+                    <p>Fix leaky faucets promptly - a single drip per second wastes over 3,000 gallons per year.</p>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3>🎯 Action Plans</h3>
+                    <div class="grid">
+                        <div class="initiative-card">
+                            <h4>Beginner (Month 1)</h4>
+                            <p>Start with simple swaps: reusable bags, water bottles, and energy-efficient appliances.</p>
+                            <span class="badge">Easy</span>
+                        </div>
+                        <div class="initiative-card">
+                            <h4>Intermediate (Month 2-3)</h4>
+                            <p>Implement composting, reduce meat consumption, and optimize home energy usage.</p>
+                            <span class="badge">Moderate</span>
+                        </div>
+                        <div class="initiative-card">
+                            <h4>Advanced (Month 4+)</h4>
+                            <p>Solar panels, electric vehicle, zero-waste lifestyle, and community leadership.</p>
+                            <span class="badge">Challenging</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web3 Variables
+        let web3;
+        let userAccount;
+        let connected = false;
+
+        // Web3 Connection Functions
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    
+                    userAccount = accounts[0];
+                    connected = true;
+                    
+                    // Update UI
+                    document.getElementById('connectButton').textContent = 'Wallet Connected ✅';
+                    document.getElementById('connectButton').classList.add('wallet-connected');
+                    document.getElementById('walletInfo').style.display = 'block';
+                    document.getElementById('walletAddress').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+                    
+                    // Get network info
+                    const networkId = await web3.eth.net.getId();
+                    const networkNames = {
+                        1: 'Ethereum Mainnet',
+                        137: 'Polygon',
+                        80001: 'Polygon Mumbai',
+                        5: 'Goerli Testnet'
+                    };
+                    document.getElementById('networkName').textContent = networkNames[networkId] || `Network ID: ${networkId}`;
+                    
+                    // Get balance
+                    const balance = await web3.eth.getBalance(userAccount);
+                    const ethBalance = web3.utils.fromWei(balance, 'ether');
+                    document.getElementById('walletBalance').textContent = parseFloat(ethBalance).toFixed(4);
+                    
+                    // Update user stats (simulated)
+                    updateUserStats();
+                    
+                    alert('🎉 Wallet connected successfully! You can now earn GREEN tokens and mint NFTs.');
+                    
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    alert('Failed to connect wallet. Please make sure MetaMask is installed and unlocked.');
+                }
+            } else {
+                alert('Please install MetaMask wallet to use Web3 features!');
+            }
+        }
+
+        // Add GREEN token to wallet
+        async function addTokenToWallet() {
+            if (!connected) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: '0x742d35Cc6634C0532925a3b8D431d4097e1cdE9a',
+                            symbol: 'GREEN',
+                            decimals: 18,
+                            image: 'https://example.com/green-token-logo.png',
+                        },
+                    },
+                });
+                alert('GREEN token added to your wallet! 🌱');
+            } catch (error) {
+                console.error('Error adding token:', error);
+            }
+        }
+
+        // Mint NFT function
+        async function mintNFT(achievementType) {
+            if (!connected) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            // Simulate NFT minting transaction
+            const achievements = {
+                'first-steps': { name: 'First Steps', reward: 50 },
+                'carbon-neutral': { name: 'Carbon Neutral', reward: 100 },
+                'community-leader': { name: 'Community Leader', reward: 200 }
+            };
+
+            const achievement = achievements[achievementType];
+            if (achievement) {
+                // In a real app, this would interact with a smart contract
+                alert(`🎨 Minting "${achievement.name}" NFT...\n\nTransaction submitted! You'll also earn ${achievement.reward} GREEN tokens.`);
+                
+                // Update user stats
+                const currentNFTs = parseInt(document.getElementById('userNFTs').textContent);
+                const currentTokens = parseInt(document.getElementById('userTokens').textContent);
+                document.getElementById('userNFTs').textContent = currentNFTs + 1;
+                document.getElementById('userTokens').textContent = currentTokens + achievement.reward;
+            }
+        }
+
+        // DAO Voting function
+        async function voteDAO(vote, proposalId) {
+            if (!connected) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            // Simulate DAO voting
+            alert(`🗳️ Casting ${vote.toUpperCase()} vote for Proposal #${proposalId}...\n\nTransaction submitted! Your vote has been recorded on-chain.`);
+            
+            // Update DAO votes
+            const currentVotes = parseInt(document.getElementById('daoVotes').textContent);
+            document.getElementById('daoVotes').textContent = currentVotes + 1;
+        }
+
+        // Claim crypto rewards
+        async function claimReward(actionType, amount) {
+            if (!connected) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            // Simulate reward claiming
+            alert(`💰 Claiming ${amount} GREEN tokens for ${actionType}...\n\nTransaction submitted! Tokens will appear in your wallet shortly.`);
+            
+            // Update user tokens
+            const currentTokens = parseInt(document.getElementById('userTokens').textContent);
+            document.getElementById('userTokens').textContent = currentTokens + amount;
+        }
+
+        // Update user stats (simulated data)
+        function updateUserStats() {
+            if (connected) {
+                // Simulate loading user's blockchain data
+                setTimeout(() => {
+                    document.getElementById('userTokens').textContent = '145';
+                    document.getElementById('userNFTs').textContent = '3';
+                    document.getElementById('carbonOffset').textContent = '1,250';
+                    document.getElementById('daoVotes').textContent = '7';
+                }, 1000);
+            }
+        }
+
+        // Listen for account changes
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    // User disconnected wallet
+                    connected = false;
+                    document.getElementById('connectButton').textContent = 'Connect MetaMask Wallet';
+                    document.getElementById('connectButton').classList.remove('wallet-connected');
+                    document.getElementById('walletInfo').style.display = 'none';
+                } else if (accounts[0] !== userAccount) {
+                    // User switched accounts
+                    userAccount = accounts[0];
+                    connectWallet();
+                }
+            });
+        }
+
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Carbon calculator functionality
+        document.getElementById('carbonForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateCarbon();
+        });
+
+        function calculateCarbon() {
+            const transport = parseFloat(document.getElementById('transport').value) || 0;
+            const energy = parseFloat(document.getElementById('energy').value) || 0;
+            const diet = document.getElementById('diet').value;
+            const waste = parseFloat(document.getElementById('waste').value) || 0;
+
+            // Emission factors (kg CO2 per unit)
+            const transportFactor = 0.2; // per km
+            const energyFactor = 0.5; // per kWh
+            const wasteFactor = 2; // per bag per week * 4 weeks
+
+            const dietFactors = {
+                'meat': 150,
+                'moderate': 100,
+                'low': 70,
+                'vegetarian': 50,
+                'vegan': 30
+            };
+
+            // Calculate emissions
+            const transportEmissions = transport * transportFactor;
+            const energyEmissions = energy * energyFactor;
+            const dietEmissions = dietFactors[diet] || 0;
+            const wasteEmissions = waste * wasteFactor * 4; // monthly
+
+            const totalEmissions = transportEmissions + energyEmissions + dietEmissions + wasteEmissions;
+
+            // Display results
+            document.getElementById('totalEmissions').textContent = totalEmissions.toFixed(1);
+            
+            // Update comparison
+            const avgEmissions = 400; // global average
+            const comparison = document.getElementById('comparison');
+            if (totalEmissions < avgEmissions) {
+                comparison.innerHTML = `<p style="color: #48bb78;">✅ Below global average by ${(avgEmissions - totalEmissions).toFixed(1)} kg CO₂</p>`;
+            } else {
+                comparison.innerHTML = `<p style="color: #f56565;">⚠️ Above global average by ${(totalEmissions - avgEmissions).toFixed(1)} kg CO₂</p>`;
+            }
+
+            // Update chart visualization
+            const maxEmissions = Math.max(transportEmissions, energyEmissions, dietEmissions, wasteEmissions);
+            const chartHeight = 150; // max height in pixels
+
+            document.getElementById('transportBar').style.height = `${(transportEmissions / maxEmissions) * chartHeight}px`;
+            document.getElementById('energyBar').style.height = `${(energyEmissions / maxEmissions) * chartHeight}px`;
+            document.getElementById('dietBar').style.height = `${(dietEmissions / maxEmissions) * chartHeight}px`;
+            document.getElementById('wasteBar').style.height = `${(wasteEmissions / maxEmissions) * chartHeight}px`;
+
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+
+        // Local initiatives finder
+        function findInitiatives() {
+            const location = document.getElementById('location').value;
+            if (location) {
+                // Simulate loading local initiatives
+                alert(`Finding environmental initiatives near ${location}... This would connect to a real database in the full application!`);
+            }
+        }
+
+        // Animate stats on load
+        window.addEventListener('load', function() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = parseInt(stat.textContent);
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        stat.textContent = finalValue;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(currentValue);
+                    }
+                }, 30);
+            });
+        });
+
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects and animations
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
